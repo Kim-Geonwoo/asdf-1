@@ -1,35 +1,34 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-import { count } from "console";
-
 import { useState, FormEvent } from "react";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Country from "@/components/findHoliday/Country";
+import Year from "@/components/findHoliday/Year";
 
 
 
 export default function Home() {
   const [country, setCountry] = useState<string>('');
   const [year, setYear] = useState<string>('');
-  const [holidays, setHolidays] = useState([]); // 휴일 데이터를 저장할 state
+  interface Holiday {
+    date: string;
+    localName: string;
+    name: string;
+  }
+
+  const [holidays, setHolidays] = useState<Holiday[]>([]); // 휴일 데이터를 저장할 state
   
+  const handleCountryChange = (newCountry: string) => {
+    setCountry(newCountry);
+  };
+
+  const handleYearChange = (newYear: string) => {
+    setYear(newYear);
+  };
+
   const handleHoliday = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
       const response = await fetch(
         `https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`,
-        {
-          // 필요한 경우 옵션 추가 (예: headers)
-        }
       );
 
       if (!response.ok) {
@@ -40,48 +39,49 @@ export default function Home() {
       setHolidays(data); // state에 휴일 데이터 저장
       console.log(data);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      alert(error.message);
+      alert((error as Error).message);
     }
   };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+      <h1 className="mb-6 text-4xl font-bold text-gray-800 mx-[-6px]">
         공휴일이 궁금해용
       </h1>
-      <p>{year}</p>
-      <p>{country}</p>
-           
 
+      <form onSubmit={handleHoliday} className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+        <div className="mb-4">
+          <Country countryValue={country} onChange={handleCountryChange} />
+        </div>
+        <div className="mb-4">
+          <Year yearValue={year} onChange={handleYearChange} />
+        </div>
 
-    <form onSubmit={handleHoliday}>
-      <div>
-        <label>궁금한 나라: </label>
-        <input type="text" value={country} onChange={(e) => setCountry(e.target.value)}></input>
+        <button 
+          type="submit" 
+          className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200"
+        >
+          확인하기
+        </button>
+      </form>
+
+      <div className="mt-6 w-full max-w-md">
+        <h2 className="mt-2 text-lg font-semibold text-gray-800">결과는?</h2>
+
+        {/* 휴일 목록 표시 */}
+        <ul className="mt-4 space-y-2">
+          {holidays.map((holiday) => (
+            <li
+              key={holiday.date}
+              className="p-4 bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition duration-200"
+            >
+              {holiday.date} - {holiday.localName} ({holiday.name})
+            </li>
+          ))}
+        </ul>
       </div>
-      <div>
-        <label>연도: </label>
-        <input type="number" value={year} onChange={(e) => setYear(e.target.value)}></input>
-      </div>
-
-      <button type="submit">확인하기</button>
-    </form>
-
-    <div>
-      <h2>결과는?</h2>
-
-      {/* 휴일 목록 표시 */}
-      <ul>
-        {holidays.map((holiday) => (
-          <li key={holiday.date}> {/* key prop 추가 */}
-            {holiday.date} - {holiday.localName} ({holiday.name})
-          </li>
-        ))}
-      </ul>
-    </div>
-      
     </div>
   );
 }
