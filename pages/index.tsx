@@ -7,7 +7,13 @@ import Year from "@/components/findHoliday/Year";
 export default function Home() {
   const [country, setCountry] = useState<string>('');
   const [year, setYear] = useState<string>('');
-  const [holidays, setHolidays] = useState([]); // 휴일 데이터를 저장할 state
+  interface Holiday {
+    date: string;
+    localName: string;
+    name: string;
+  }
+
+  const [holidays, setHolidays] = useState<Holiday[]>([]); // 휴일 데이터를 저장할 state
   
   const handleCountryChange = (newCountry: string) => {
     setCountry(newCountry);
@@ -41,7 +47,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
-      <h1 className="mb-6 text-4xl font-bold text-gray-800">
+      <h1 className="mb-6 text-4xl font-bold text-gray-800 mx-[-6px]">
         공휴일이 궁금해용
       </h1>
 
