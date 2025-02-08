@@ -39,9 +39,9 @@ export default function Home() {
       setHolidays(data); // state에 휴일 데이터 저장
       console.log(data);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      alert(error.message);
+      alert((error as Error).message);
     }
   };
 
